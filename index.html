@@ -95,6 +95,9 @@
             var pathCircle = GenerateCircle();
             var pathCross =  GenerateCross();
 
+
+            // Symbol Creation for each value
+
             svg.append("g")
             .selectAll("path")
             .data(iris)
@@ -111,30 +114,11 @@
               else if (d.species == "versicolor") {return "green";}
               else {return "red";}
             })
-            //.attr("transform","translate(300,100)")
-
-
-
-
-
 
 
 
 
             });
-
-
-            // Creating scales 
-
-            //console.log(x(1));
-
-            // Circles for each value 
-
-            /*svg.selectAll("circle").data(iris).enter().append(circle)
-            .attr("cx", function(d) {return x(d.petal_length); })
-            .attr("cy", function(d) {return y(d.petal_width); })
-            .attr("r",5)
-            .style("fill", "red");*/
 
         </script>
     </body>
