@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>Scatterplot of Iris</title>
+        <script type="text/javascript" src="d3/d3.js"></script>
+        <style type="text/css">
+          .axis path,
+          .axis line{
+            fill: none;
+            stroke: black;
+            shape-rendering: crispEdges;
+          }
+          .axis text {
+            font-family : sans-serif;
+            font-size: 11px;
+          }
+
+
+        </style>
+    </head>
+    <body>
+        <script type="text/javascript">
+            // Width and height definition 
+            var w = 760;
+            var h = 300;
+            var symbolsize = 20;
+
+            // Margin setup
+            var margin = {top: 20, right: 30, bottom: 20, left: 100},
+            width = w - margin.left - margin.right,
+            height = h - margin.top - margin.bottom;
+    
+            // Basic SVG canvas
+            var svg = d3.select("body").append("svg")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+            .append("g")
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+            // Loading data
+
+            var iris;
+
+            d3.csv("iris.csv", function(data) {
+              console.log(data);
+              iris = data;
+
+
+            // Scale definition 
+
+            var x = d3.scaleLinear()
+            .domain([0,d3.max(iris,function(d,i) {return d.petal_length; })])
+            .range([0, width]);
+
+            var y = d3.scaleLinear()
+            .domain([0,d3.max(iris, function(d) {return d.petal_width; })])
+            .range([height,0]);
+
+
+
+            // Generate axis
+
+            var xAxis = d3.axisBottom(x);
+            var yAxis = d3.axisLeft(y);
+
+            svg.append("g")
+            .attr("class","axis")
+            .call(yAxis);
+
+
+            svg.append("g")
+            .attr("class","axis")
+            .attr("transform", function(){return "translate(0,"+height+")";})
+            .call(xAxis);
+
+            // Symbol Generation
+            /* Star, green : versicolor
+               Circle, blue : setosa 
+               Cross, red : virginica*/
+
+            var GenerateStar = d3.symbol()
+            .type(d3.symbolStar)
+            .size(symbolsize);
+
+            var GenerateCircle = d3.symbol()
+            .type(d3.symbolCircle)
+            .size(symbolsize);
+
+            var GenerateCross= d3.symbol()
+            .type(d3.symbolCross)
+            .size(symbolsize);
+
+            var pathStar = GenerateStar();
+            var pathCircle = GenerateCircle();
+            var pathCross =  GenerateCross();
+
+            svg.append("g")
+            .selectAll("path")
+            .data(iris)
+            .enter()
+            .append("path")
+            .attr("d", function(d) {
+              if (d.species == "setosa") {return pathCircle; }
+              else if (d.species == "versicolor") {return pathStar;}
+              else {return pathCross;}
+            })
+            .attr("transform",function(d) {return "translate(" + x(d.petal_length) +","+y(d.petal_width)+")" ;})
+            .style("fill", function(d) {
+              if (d.species == "setosa") {return "blue"; }
+              else if (d.species == "versicolor") {return "green";}
+              else {return "red";}
+            })
+            //.attr("transform","translate(300,100)")
+
+
+
+
+
+
+
+
+
+            });
+
+
+            // Creating scales 
+
+            //console.log(x(1));
+
+            // Circles for each value 
+
+            /*svg.selectAll("circle").data(iris).enter().append(circle)
+            .attr("cx", function(d) {return x(d.petal_length); })
+            .attr("cy", function(d) {return y(d.petal_width); })
+            .attr("r",5)
+            .style("fill", "red");*/
+
+        </script>
+    </body>
+</html>
