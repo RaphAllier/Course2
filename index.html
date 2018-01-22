@@ -17,7 +17,7 @@
           }
 
           .label {
-            font-family:  : sans-serif;
+            font-family: 	sans-serif;
             font-size: 11px;
           }
 
@@ -32,6 +32,13 @@
             stroke-width: 2;
           }
 
+          #tooltip {
+
+          	font-family: sans-serif;
+          	font-size: 11px;
+          	font-weight: bold;
+          }
+
 
         </style>
     </head>
@@ -40,7 +47,7 @@
             // Width and height definition 
             var w = 760;
             var h = 400;
-            var symbolsize = 20;
+            var symbolsize = 30;
 
             // Margin setup
             var margin = {top: 50, right: 30, bottom: 50, left: 100},
@@ -53,6 +60,10 @@
             .attr("height", height + margin.top + margin.bottom)
             .append("g")
             .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+            // g 
+
+            var g = svg.append("g");
 
             // Loading data
 
@@ -125,7 +136,7 @@
               return (regdata)
             }
 
-            console.log(create_regression(iris))
+            
 
             // Regression creation 
             
@@ -172,6 +183,62 @@
             .attr("y",height+40)
             .text("Iris dataset Scatterplot")
 
+            // Legend 
+
+            var LegendSymbolSize = 120;
+
+            var GenLegendStar = d3.symbol()
+            .type(d3.symbolStar)
+            .size(LegendSymbolSize);
+
+            var GenLegendCross = d3.symbol()
+            .type(d3.symbolCross)
+            .size(LegendSymbolSize);
+            
+            var GenLegendCircle = d3.symbol()
+            .type(d3.symbolCircle)
+            .size(LegendSymbolSize);
+
+            svg.append("rect")
+            .attr("x","50")
+            .attr("y","30")
+            .attr("width","200")
+            .attr("height","100")
+            .style("fill","white")
+            .style("stroke-width","1")
+            .style("stroke","black");
+
+            var legend = svg.append("g")
+            .attr("class","legend-symbol");
+
+            legend.append("path")
+            .attr("d",GenLegendCircle())
+            .attr("transform","translate(70,50)")
+            .style("fill","blue");
+
+            legend.append("path")
+            .attr("d",GenLegendStar())
+            .attr("transform","translate(70,80)")
+            .style("fill","green");
+
+            legend.append("path")
+            .attr("d",GenLegendCross())
+            .attr("transform","translate(70,110)")
+            .style("fill","red");
+
+            legend.append("text")
+            .attr("transform","translate(85,55)")
+            .text("Setosa");
+
+            legend.append("text")
+            .attr("transform","translate(85,85)")
+            .text("Versicolor");
+
+            legend.append("text")
+            .attr("transform","translate(85,115)")
+            .text("Virginica");
+
+
             // Symbol Generation
             /* Star, green : versicolor
                Circle, blue : setosa 
@@ -189,10 +256,6 @@
             .type(d3.symbolCross)
             .size(symbolsize);
 
-            var pathStar = GenerateStar();
-            var pathCircle = GenerateCircle();
-            var pathCross =  GenerateCross();
-
 
             // Symbol Creation for each value
 
@@ -202,9 +265,9 @@
             .enter()
             .append("path")
             .attr("d", function(d) {
-              if (d.species == "setosa") {return pathCircle; }
-              else if (d.species == "versicolor") {return pathStar;}
-              else {return pathCross;}
+              if (d.species == "setosa") {return GenerateCircle(); }
+              else if (d.species == "versicolor") {return GenerateStar();}
+              else {return GenerateCross();}
             })
             .attr("transform",function(d) {return "translate(" + x(d.petal_length) +","+y(d.petal_width)+")" ;})
             .style("fill", function(d) {
@@ -213,27 +276,24 @@
               else {return "red";}
             })
             .on("mouseover",function(d) {
-              d3.select(this).attr("fill","black");
-              svg.selectAll("#tooltip").data(d).enter().append("text")
+              d3.select(this).transition().duration(500).style("fill","black");
+
+              svg.selectAll("#tooltip").data([d]).enter().append("text")
               .attr("id","tooltip")
-              .text(function(d){return "(" + d.petal_length +"," + d.petal_width + ") | " +d.species ; })
+              .text(function(d){return "(" + d.petal_length +"," + d.petal_width + ")  " +d.species ; })
               .attr("x",function(d) {return x(d.petal_length);})
-              .attr("y",function(d) {y(d.petal_width)-5;})
+              .attr("y",function(d) {return y(d.petal_width)-5;});
+
+            })
             .on("mouseout",function(d){
-              d3.select(this).transition().duration(500).style("fill",function(d) {
+            	d3.select(this).transition().duration(250).style("fill",function(d) {
               if (d.species == "setosa") {return "blue"; }
               else if (d.species == "versicolor") {return "green";}
-              else {return "red";}})
+              else {return "red";}});
 
-              svg.selectAll("#tooltip").remove();
-
-            })
-
+            	d3.select("#tooltip").remove();
 
             })
-
-
-
 
             });
 
