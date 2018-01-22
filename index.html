@@ -13,7 +13,23 @@
           }
           .axis text {
             font-family : sans-serif;
+            font-size: 10px;
+          }
+
+          .label {
+            font-family:  : sans-serif;
             font-size: 11px;
+          }
+
+          .title {
+            font-family : sans-serif;
+            font-size: 20px;
+          }
+
+          .line {
+            stroke: black;
+            fill: none;
+            stroke-width: 2;
           }
 
 
@@ -23,11 +39,11 @@
         <script type="text/javascript">
             // Width and height definition 
             var w = 760;
-            var h = 300;
+            var h = 400;
             var symbolsize = 20;
 
             // Margin setup
-            var margin = {top: 20, right: 30, bottom: 20, left: 100},
+            var margin = {top: 50, right: 30, bottom: 50, left: 100},
             width = w - margin.left - margin.right,
             height = h - margin.top - margin.bottom;
     
@@ -43,7 +59,6 @@
             var iris;
 
             d3.csv("iris.csv", function(data) {
-              console.log(data);
               iris = data;
 
 
@@ -57,7 +72,69 @@
             .domain([0,d3.max(iris, function(d) {return d.petal_width; })])
             .range([height,0]);
 
+            // Line definition for regression
 
+            var line = d3.line()
+            .x(function(d) { return x(d.x);})
+            .y(function(d) {return y(d.yreg);});
+
+            // Regression function
+
+            function create_regression(d){
+              var x_mean = 0;
+              var y_mean = 0;
+              var term1 = 0;
+              var term2 = 0;
+              var xr = 0;
+              var yr= 0;
+
+              // Compute mean
+              for (var i =0; i< d.length;i++){
+                x_mean += parseFloat(d[i].petal_length);
+                y_mean += parseFloat(d[i].petal_width);
+              }
+              x_mean /= d.length;
+              y_mean /= d.length;
+
+              // Compute coefficients
+              
+              for (i=0; i<d.length;i++){
+                xr = parseFloat(d[i].petal_length) - x_mean;
+                yr = parseFloat(d[i].petal_width) - y_mean;
+                term1 += xr*yr;
+                term2 += xr*xr;
+              }
+              var b1 = term1/term2;
+              var b0 = y_mean - (b1*x_mean);
+              
+              // Push regression coordinates
+              var yreg = [];
+              for (i=0;i<d.length;i++){
+                yreg.push(b0 + (parseFloat(d[i].petal_length)*b1));
+              }
+
+              // Creates Data for regression line
+              var regdata = [];
+              for (i=0;i<d.length;i++){
+                regdata.push({
+                  "yreg":yreg[i],
+                  "x":parseFloat(d[i].petal_length)
+                })
+
+              }
+              return (regdata)
+            }
+
+            console.log(create_regression(iris))
+
+            // Regression creation 
+            
+            var reg = create_regression(iris);
+
+            svg.append("path")
+            .datum(reg)
+            .attr("class","line")
+            .attr("d",line);
 
             // Generate axis
 
@@ -68,11 +145,32 @@
             .attr("class","axis")
             .call(yAxis);
 
-
             svg.append("g")
             .attr("class","axis")
             .attr("transform", function(){return "translate(0,"+height+")";})
             .call(xAxis);
+
+            // Axis names and Scatterplot title
+
+            svg.append("text")
+            .attr("class","label")
+            .attr("transform","rotate(-90)")
+            .attr("x","-55")
+            .attr("y","15")
+            .text("Petal width");
+
+            svg.append("text")
+            .attr("class","label")
+            .attr("x",width-50)
+            .attr("y",height-5)
+            .text("Petal length");
+
+
+            svg.append("text")
+            .attr("class","title")
+            .attr("x",width/2-75)
+            .attr("y",height+40)
+            .text("Iris dataset Scatterplot")
 
             // Symbol Generation
             /* Star, green : versicolor
@@ -113,6 +211,25 @@
               if (d.species == "setosa") {return "blue"; }
               else if (d.species == "versicolor") {return "green";}
               else {return "red";}
+            })
+            .on("mouseover",function(d) {
+              d3.select(this).attr("fill","black");
+              svg.selectAll("#tooltip").data(d).enter().append("text")
+              .attr("id","tooltip")
+              .text(function(d){return "(" + d.petal_length +"," + d.petal_width + ") | " +d.species ; })
+              .attr("x",function(d) {return x(d.petal_length);})
+              .attr("y",function(d) {y(d.petal_width)-5;})
+            .on("mouseout",function(d){
+              d3.select(this).transition().duration(500).style("fill",function(d) {
+              if (d.species == "setosa") {return "blue"; }
+              else if (d.species == "versicolor") {return "green";}
+              else {return "red";}})
+
+              svg.selectAll("#tooltip").remove();
+
+            })
+
+
             })
 
 
