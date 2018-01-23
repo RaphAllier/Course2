@@ -49,9 +49,6 @@
             var h = 400;
             var symbolsize = 40;
 
-            var xAxisPadding=50;
-            var yAxisPadding=50;
-
             // Margin setup
             var margin = {top: 50, right: 30, bottom: 50, left: 100},
             width = w - margin.left - margin.right,
@@ -80,11 +77,11 @@
 
             var x = d3.scaleLinear()
             .domain([0,d3.max(iris,function(d,i) {return d.petal_length; })])
-            .range([xAxisPadding, width-xAxisPadding]);
+            .range([0, width]);
 
             var y = d3.scaleLinear()
             .domain([0,d3.max(iris, function(d) {return d.petal_width; })])
-            .range([height-yAxisPadding,yAxisPadding]);
+            .range([height,0]);
 
             // Line definition for regression
 
@@ -157,12 +154,11 @@
 
             svg.append("g")
             .attr("class","axis")
-            .attr("transform", function(){return "translate(0,"+yAxisPadding+")";})
             .call(yAxis);
 
             svg.append("g")
             .attr("class","axis")
-            .attr("transform", function(){return "translate(0,"+height-xAxisPadding+")";})
+            .attr("transform", function(){return "translate(0,"+height+")";})
             .call(xAxis);
 
             // Axis names and Scatterplot title
@@ -184,7 +180,7 @@
             svg.append("text")
             .attr("class","title")
             .attr("x",width/2)
-            .attr("y",xAxisPadding/2)
+            .attr("y",20)
             .text("Iris dataset Scatterplot")
 
             // Legend 
