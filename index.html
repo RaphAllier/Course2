@@ -23,7 +23,8 @@
 
           .title {
             font-family : sans-serif;
-            font-size: 20px;
+            font-size: 25px;
+            text-anchor: middle;
           }
 
           .line {
@@ -161,7 +162,7 @@
             .attr("transform", function(){return "translate(0,"+height+")";})
             .call(xAxis);
 
-            // Axis names and Scatterplot title
+            // Axis names 
 
             svg.append("text")
             .attr("class","label")
@@ -170,6 +171,7 @@
             .attr("y","15")
             .text("Petal width");
 
+
             svg.append("text")
             .attr("class","label")
             .attr("x",width-50)
@@ -177,11 +179,13 @@
             .text("Petal length");
 
 
+            // Scatterplot title
+
             svg.append("text")
             .attr("class","title")
-            .attr("x",width/2)
-            .attr("y",20)
-            .text("Iris dataset Scatterplot")
+            .attr("x",(w-margin.left)/2)
+            .attr("y",-margin.top/2)
+            .text("Iris dataset Scatterplot");
 
             // Legend 
 
